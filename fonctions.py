@@ -33,20 +33,43 @@ def selectionner_equipements(catalogue, prix_max, poids_max_g, longueur_max_cm):
 # Étape 3 : réunir les codes, filtrer les fiches et repérer une offre manquante.
 def consommables_disponibles(catalogue):
     """Retourne les codes utilisés ou fournis, sans doublons ni mutation."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("consommables_disponibles est à compléter.")
+    consumables = set()
+    for product in catalogue:
+        for consum in product["consommables_utilises"]:
+            if consum not in consumables:
+                consumables.add(consum)
+        for consum in product["consommables_fournis"]:
+            if consum not in consumables:
+                consumables.add(consum)
+    return consumables
 
 
 def filtrer_par_consommable(catalogue, code):
     """Retourne une nouvelle liste des utilisateurs et fournisseurs du code, dans l'ordre."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("filtrer_par_consommable est à compléter.")
+    filtrered_catalogue = []
+    for product in catalogue:
+        if (
+            code in product["consommables_utilises"]
+            or code in product["consommables_fournis"]
+        ):
+            filtrered_catalogue.append(product)
+    return filtrered_catalogue
 
 
 def consommables_sans_offre(catalogue):
     """Retourne les codes utilisés par un produit mais fournis par aucune référence."""
+    besoin = set()
+    offre = set()
+    for product in catalogue:
+        for cons_used in product["consommables_utilises"]:
+            if cons_used not in besoin:
+                besoin.add(cons_used)
+        for cons_offered in product["consommables_fournis"]:
+            if cons_offered not in offre:
+                offre.add(cons_offered)
+    return set(besoin - offre)
     # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("consommables_sans_offre est à compléter.")
+    # raise NotImplementedError("consommables_sans_offre est à compléter.")
 
 
 # Étape 4 : transformer chaque demande en une ligne de commande indépendante.

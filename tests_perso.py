@@ -11,7 +11,46 @@ from fonctions import (
     rechercher_produits,
     selectionner_equipements,
     total_avec_livraison,
+    consommables_disponibles,
+    filtrer_par_consommable,
 )
+
+
+def petit_catalogue():
+    return [
+        {
+            "id": "L1",
+            "categorie": "lanceur",
+            "consommables_utilises": ["bille"],
+            "consommables_fournis": [],
+            "prix_euros": 20,
+            "favori": False,
+        },
+        {
+            "id": "L2",
+            "categorie": "lanceur",
+            "consommables_utilises": ["disque"],
+            "consommables_fournis": [],
+            "prix_euros": 30,
+            "favori": False,
+        },
+        {
+            "id": "M1",
+            "categorie": "munition",
+            "consommables_utilises": [],
+            "consommables_fournis": ["bille"],
+            "prix_euros": 5,
+            "favori": False,
+        },
+        {
+            "id": "M2",
+            "categorie": "munition",
+            "consommables_utilises": [],
+            "consommables_fournis": ["disque", "bille"],
+            "prix_euros": 8,
+            "favori": False,
+        },
+    ]
 
 
 def catalogue_essai():
@@ -89,10 +128,30 @@ def test_selection_seuil_inclus():
 
 
 # Étape 3 : comparer les besoins aux références fournies.
+def test_consommables_disponibles():
+    """catalogue_essai() fournit et utilise {'liquide', 'billes'} ; seul ces codes sont attendus."""
+    catalogue = catalogue_essai()
+    result = consommables_disponibles(catalogue)
+    assert result == {"bille", "liquide"}, (
+        f"Expected {{''bille'', ''liquide''}}, got: {result}"
+    )
+    print(result)
+
+
+def test_filtrer_par_consommable():
+    catalogue = catalogue_essai()
+    result = filtrer_par_consommable(catalogue, "bille")
+    print(result)
+    assert result == ["L1", "M1"], f"Expected ['L1', 'M1'], got: {result}"
+
+
 def test_consommable_sans_fournisseur():
     """catalogue_essai() utilise « liquide » sans fournisseur ; seul ce code est attendu."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_consommable_sans_fournisseur est à compléter.")
+    catalogue = catalogue_essai()
+    result = consommables_sans_offre(catalogue)
+    assert type(result) == set, f"Expected result to be a set, not a {type(result)}"
+    assert result == {"liquide"}, f"Expected result to be {{'liquide'}}, not: {result}"
+    print(result)
 
 
 # Étape 4 : contrôler la conversion et la copie d'une fiche.
@@ -142,3 +201,9 @@ def test_parcours_complet():
 
 # test_recherche_normalisee()
 # test_selection_seuil_inclus()
+print("Test - consommables_disponibles")
+test_consommables_disponibles()
+print("Test - filter_par_consommable")
+test_filtrer_par_consommable()
+print("Test - consommable_sans_fournisseur")
+test_consommable_sans_fournisseur()

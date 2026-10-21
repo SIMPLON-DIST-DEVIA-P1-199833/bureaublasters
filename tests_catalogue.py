@@ -11,26 +11,65 @@ from pathlib import Path
 
 from catalogue import CATALOGUE
 from fonctions import (
-    calculer_budget, calculer_total, consommables_disponibles, consommables_sans_offre,
-    definir_favori, filtrer_par_consommable, formater_devis, lire_demande,
-    preparer_commande, preparer_ligne, rechercher_produits, selectionner_equipements,
-    sons_pour_produit, total_avec_livraison, trouver_produit,
+    calculer_budget,
+    calculer_total,
+    consommables_disponibles,
+    consommables_sans_offre,
+    definir_favori,
+    filtrer_par_consommable,
+    formater_devis,
+    lire_demande,
+    preparer_commande,
+    preparer_ligne,
+    rechercher_produits,
+    selectionner_equipements,
+    sons_pour_produit,
+    total_avec_livraison,
+    trouver_produit,
 )
 from sons import SONS_PRODUITS
 
-GROUPES = ["donnees", "recherche", "filtres", "budget", "commande", "devis", "favoris", "perso"]
+GROUPES = [
+    "donnees",
+    "recherche",
+    "filtres",
+    "budget",
+    "commande",
+    "devis",
+    "favoris",
+    "perso",
+]
 BONUS = ["audio"]
 TESTS_OBLIGATOIRES = {
-    "test_recherche_normalisee", "test_selection_seuil_inclus", "test_consommable_sans_fournisseur",
-    "test_lecture_demande", "test_ligne_independante", "test_total_cumule",
-    "test_commande_vide_sans_frais", "test_favori_autres_champs", "test_frais_parametres",
+    "test_recherche_normalisee",
+    "test_selection_seuil_inclus",
+    "test_consommable_sans_fournisseur",
+    "test_lecture_demande",
+    "test_ligne_independante",
+    "test_total_cumule",
+    "test_commande_vide_sans_frais",
+    "test_favori_autres_champs",
+    "test_frais_parametres",
     "test_parcours_complet",
 }
 
 CLES = {
-    "id", "nom", "categorie", "description", "prix_euros", "conditionnement",
-    "consommables_utilises", "consommables_fournis", "portee_m", "cadence_tirs_min", "poids_g", "dimensions_cm",
-    "indice_protection", "effets", "image", "favori",
+    "id",
+    "nom",
+    "categorie",
+    "description",
+    "prix_euros",
+    "conditionnement",
+    "consommables_utilises",
+    "consommables_fournis",
+    "portee_m",
+    "cadence_tirs_min",
+    "poids_g",
+    "dimensions_cm",
+    "indice_protection",
+    "effets",
+    "image",
+    "favori",
 }
 EQUIPEMENTS = {"lanceur", "accessoire"}
 CONSOMMABLES = {"munition", "recharge"}
@@ -65,8 +104,17 @@ def test_donnees_cles():
 
 def test_donnees_textes():
     for produit in CATALOGUE:
-        for cle in ["id", "nom", "categorie", "description", "conditionnement", "image"]:
-            assert isinstance(produit[cle], str), f"{produit['id']} : {cle} vaut {decrire(produit[cle])}, texte attendu"
+        for cle in [
+            "id",
+            "nom",
+            "categorie",
+            "description",
+            "conditionnement",
+            "image",
+        ]:
+            assert isinstance(produit[cle], str), (
+                f"{produit['id']} : {cle} vaut {decrire(produit[cle])}, texte attendu"
+            )
         assert produit["categorie"] in EQUIPEMENTS | CONSOMMABLES, (
             f"{produit['id']} : catégorie inconnue {produit['categorie']!r}"
         )
@@ -75,7 +123,9 @@ def test_donnees_textes():
 def test_donnees_prix():
     for produit in CATALOGUE:
         prix = produit["prix_euros"]
-        assert est_nombre(prix) and prix > 0, f"{produit['id']} : prix_euros vaut {decrire(prix)}, nombre positif attendu"
+        assert est_nombre(prix) and prix > 0, (
+            f"{produit['id']} : prix_euros vaut {decrire(prix)}, nombre positif attendu"
+        )
 
 
 def test_donnees_mesures():
@@ -89,25 +139,35 @@ def test_donnees_mesures():
             f"{produit['id']} : poids_g vaut {decrire(produit['poids_g'])}, entier positif attendu"
         )
         dimensions = produit["dimensions_cm"]
-        assert set(dimensions) == set(COLIS_MAX_CM), f"{produit['id']} : clés de dimensions_cm {set(dimensions)}"
+        assert set(dimensions) == set(COLIS_MAX_CM), (
+            f"{produit['id']} : clés de dimensions_cm {set(dimensions)}"
+        )
         for cle, valeur in dimensions.items():
-            assert est_nombre(valeur) and valeur > 0, f"{produit['id']} : {cle} vaut {decrire(valeur)}"
+            assert est_nombre(valeur) and valeur > 0, (
+                f"{produit['id']} : {cle} vaut {decrire(valeur)}"
+            )
 
 
 def test_donnees_colis():
     for produit in CATALOGUE:
         for cle, maximum in COLIS_MAX_CM.items():
             valeur = produit["dimensions_cm"][cle]
-            assert valeur <= maximum, f"{produit['id']} : {cle} de {valeur} cm, colis limité à {maximum} cm"
+            assert valeur <= maximum, (
+                f"{produit['id']} : {cle} de {valeur} cm, colis limité à {maximum} cm"
+            )
 
 
 def test_donnees_listes():
     for produit in CATALOGUE:
         for cle in ["consommables_utilises", "consommables_fournis", "effets"]:
             valeurs = produit[cle]
-            assert isinstance(valeurs, list), f"{produit['id']} : {cle} vaut {decrire(valeurs)}, liste attendue"
+            assert isinstance(valeurs, list), (
+                f"{produit['id']} : {cle} vaut {decrire(valeurs)}, liste attendue"
+            )
             for valeur in valeurs:
-                assert isinstance(valeur, str), f"{produit['id']} : {cle} contient {decrire(valeur)}"
+                assert isinstance(valeur, str), (
+                    f"{produit['id']} : {cle} contient {decrire(valeur)}"
+                )
         assert produit["consommables_utilises"] or produit["consommables_fournis"], (
             f"{produit['id']} : aucun consommable utilisé ou fourni"
         )
@@ -120,32 +180,46 @@ def test_donnees_listes():
 def test_donnees_favoris():
     for produit in CATALOGUE:
         favori = produit["favori"]
-        assert isinstance(favori, bool), f"{produit['id']} : favori vaut {decrire(favori)}, booléen attendu"
+        assert isinstance(favori, bool), (
+            f"{produit['id']} : favori vaut {decrire(favori)}, booléen attendu"
+        )
 
 
 def test_donnees_compatibilites():
     for produit in CATALOGUE:
-        assert not set(produit["consommables_utilises"]) & set(produit["consommables_fournis"]), (
-            f"{produit['id']} : le produit ne doit pas se consommer lui-même"
-        )
+        assert not set(produit["consommables_utilises"]) & set(
+            produit["consommables_fournis"]
+        ), f"{produit['id']} : le produit ne doit pas se consommer lui-même"
         for role, oppose in [("utilises", "fournis"), ("fournis", "utilises")]:
             for code in produit[f"consommables_{role}"]:
                 partenaires = [
-                    autre["id"] for autre in CATALOGUE
-                    if autre["id"] != produit["id"] and code in autre[f"consommables_{oppose}"]
+                    autre["id"]
+                    for autre in CATALOGUE
+                    if autre["id"] != produit["id"]
+                    and code in autre[f"consommables_{oppose}"]
                 ]
-                assert partenaires, f"{produit['id']} : aucun consommable {oppose} associé au code {code!r}"
+                assert partenaires, (
+                    f"{produit['id']} : aucun consommable {oppose} associé au code {code!r}"
+                )
         if produit["categorie"] in EQUIPEMENTS:
-            assert not produit["consommables_fournis"], f"{produit['id']} : munitions et liquides vendus séparément"
+            assert not produit["consommables_fournis"], (
+                f"{produit['id']} : munitions et liquides vendus séparément"
+            )
         else:
-            assert produit["consommables_fournis"], f"{produit['id']} : code du consommable fourni absent"
+            assert produit["consommables_fournis"], (
+                f"{produit['id']} : code du consommable fourni absent"
+            )
 
 
 def test_donnees_brume():
     brumes = [produit for produit in CATALOGUE if produit["id"] == "BB-04"]
     assert brumes, "BB-04 est absent du catalogue"
-    assert brumes[0]["nom"] == "Fumigène à ultrason", f"BB-04 : nom obtenu {brumes[0]['nom']!r}"
-    assert brumes[0]["indice_protection"] == "IP68", f"BB-04 : indice_protection vaut {brumes[0]['indice_protection']!r}"
+    assert brumes[0]["nom"] == "Fumigène à ultrason", (
+        f"BB-04 : nom obtenu {brumes[0]['nom']!r}"
+    )
+    assert brumes[0]["indice_protection"] == "IP68", (
+        f"BB-04 : indice_protection vaut {brumes[0]['indice_protection']!r}"
+    )
     assert brumes[0]["dimensions_cm"] == {"longueur": 4, "largeur": 4, "hauteur": 6}, (
         f"BB-04 : dimensions obtenues {brumes[0]['dimensions_cm']}"
     )
@@ -153,48 +227,98 @@ def test_donnees_brume():
 
 def test_donnees_mini_requins_rechargeables():
     produits = {produit["id"]: produit for produit in CATALOGUE}
-    assert produits["RE-02"]["categorie"] == "munition", "RE-02 : catégorie munition attendue"
-    assert produits["RE-02"]["consommables_utilises"] == ["brume-neutre", "brume-girofle-agrumes"], (
+    assert produits["RE-02"]["categorie"] == "munition", (
+        "RE-02 : catégorie munition attendue"
+    )
+    assert produits["RE-02"]["consommables_utilises"] == [
+        "brume-neutre",
+        "brume-girofle-agrumes",
+    ], (
         f"RE-02 : consommables utilisés obtenus {produits['RE-02']['consommables_utilises']}"
     )
-    assert produits["RE-02"]["consommables_fournis"] == ["requin-mousse"], "Les mini-requins sont la munition fournie"
-    assert produits["BB-02"]["consommables_utilises"] == ["requin-mousse"], "Le lanceur ne reçoit pas de liquide"
-    assert produits["BB-02"]["consommables_fournis"] == [], "Le lanceur est vendu sans munition ni liquide"
+    assert produits["RE-02"]["consommables_fournis"] == ["requin-mousse"], (
+        "Les mini-requins sont la munition fournie"
+    )
+    assert produits["BB-02"]["consommables_utilises"] == ["requin-mousse"], (
+        "Le lanceur ne reçoit pas de liquide"
+    )
+    assert produits["BB-02"]["consommables_fournis"] == [], (
+        "Le lanceur est vendu sans munition ni liquide"
+    )
 
 
 def test_donnees_recharges_liquides():
     produits = {produit["id"]: produit for produit in CATALOGUE}
-    for identifiant, code in [("RE-07", "brume-neutre"), ("RE-08", "brume-girofle-agrumes")]:
+    for identifiant, code in [
+        ("RE-07", "brume-neutre"),
+        ("RE-08", "brume-girofle-agrumes"),
+    ]:
         produit = produits[identifiant]
-        assert produit["categorie"] == "recharge", f"{identifiant} : catégorie recharge attendue"
-        assert produit["conditionnement"] == "1 bouteille de 100 ml", f"{identifiant} : bouteille attendue"
-        assert produit["consommables_utilises"] == [], f"{identifiant} : la bouteille n’utilise pas de consommable"
-        assert produit["consommables_fournis"] == [code], f"{identifiant} : code de liquide fourni incorrect"
-        utilisateurs = [produit["id"] for produit in CATALOGUE if code in produit["consommables_utilises"]]
-        assert utilisateurs == ["BB-04", "RE-02"], f"{code} : utilisateurs obtenus {utilisateurs}"
-        fournisseurs = [produit["id"] for produit in CATALOGUE if code in produit["consommables_fournis"]]
-        assert fournisseurs == [identifiant], f"{code} : fournisseurs obtenus {fournisseurs}"
+        assert produit["categorie"] == "recharge", (
+            f"{identifiant} : catégorie recharge attendue"
+        )
+        assert produit["conditionnement"] == "1 bouteille de 100 ml", (
+            f"{identifiant} : bouteille attendue"
+        )
+        assert produit["consommables_utilises"] == [], (
+            f"{identifiant} : la bouteille n’utilise pas de consommable"
+        )
+        assert produit["consommables_fournis"] == [code], (
+            f"{identifiant} : code de liquide fourni incorrect"
+        )
+        utilisateurs = [
+            produit["id"]
+            for produit in CATALOGUE
+            if code in produit["consommables_utilises"]
+        ]
+        assert utilisateurs == ["BB-04", "RE-02"], (
+            f"{code} : utilisateurs obtenus {utilisateurs}"
+        )
+        fournisseurs = [
+            produit["id"]
+            for produit in CATALOGUE
+            if code in produit["consommables_fournis"]
+        ]
+        assert fournisseurs == [identifiant], (
+            f"{code} : fournisseurs obtenus {fournisseurs}"
+        )
 
 
 def test_donnees_fiches_synchronisees():
-    source = Path(__file__).with_name("catalogue_source.txt").read_text(encoding="utf-8")
+    source = (
+        Path(__file__).with_name("catalogue_source.txt").read_text(encoding="utf-8")
+    )
     fiches = {}
     for bloc in source.split("Identifiant : ")[1:]:
         identifiant, *lignes = bloc.splitlines()
-        fiches[identifiant] = dict(ligne.split(" : ", 1) for ligne in lignes if " : " in ligne)
-    assert list(fiches) == ["BB-02", "BB-04", "RE-08"], "L’extrait doit contenir seulement les trois fiches à migrer"
+        fiches[identifiant] = dict(
+            ligne.split(" : ", 1) for ligne in lignes if " : " in ligne
+        )
+    assert list(fiches) == ["BB-02", "BB-04", "RE-08"], (
+        "L’extrait doit contenir seulement les trois fiches à migrer"
+    )
     produits = {produit["id"]: produit for produit in CATALOGUE}
     for identifiant, fiche in fiches.items():
-        assert identifiant in produits, f"{identifiant} : fiche de l’extrait absente du catalogue Python"
+        assert identifiant in produits, (
+            f"{identifiant} : fiche de l’extrait absente du catalogue Python"
+        )
         produit = produits[identifiant]
-        for cle, libelle in [("nom", "Nom"), ("description", "Description"), ("conditionnement", "Conditionnement")]:
-            assert produit[cle] == fiche[libelle], f"{produit['id']} : {cle} diffère de la fiche source"
+        for cle, libelle in [
+            ("nom", "Nom"),
+            ("description", "Description"),
+            ("conditionnement", "Conditionnement"),
+        ]:
+            assert produit[cle] == fiche[libelle], (
+                f"{produit['id']} : {cle} diffère de la fiche source"
+            )
         for cle, libelle in [
             ("consommables_utilises", "Consommables utilisés"),
             ("consommables_fournis", "Consommables fournis"),
         ]:
             codes = [] if fiche[libelle] == "aucun" else fiche[libelle].split(" ; ")
-            assert produit[cle] == codes, f"{produit['id']} : {cle} différent de la fiche source"
+            assert produit[cle] == codes, (
+                f"{produit['id']} : {cle} différent de la fiche source"
+            )
         effets = [] if fiche["Effets"] == "aucun" else fiche["Effets"].split(" ; ")
         assert produit["effets"] == effets, (
             f"{produit['id']} : effets différents de la fiche source"
@@ -206,14 +330,38 @@ def test_donnees_fiches_synchronisees():
 
 def petit_catalogue():
     return [
-        {"id": "L1", "categorie": "lanceur", "consommables_utilises": ["bille"],
-         "consommables_fournis": [], "prix_euros": 20, "favori": False},
-        {"id": "L2", "categorie": "lanceur", "consommables_utilises": ["disque"],
-         "consommables_fournis": [], "prix_euros": 30, "favori": False},
-        {"id": "M1", "categorie": "munition", "consommables_utilises": [],
-         "consommables_fournis": ["bille"], "prix_euros": 5, "favori": False},
-        {"id": "M2", "categorie": "munition", "consommables_utilises": [],
-         "consommables_fournis": ["disque", "bille"], "prix_euros": 8, "favori": False},
+        {
+            "id": "L1",
+            "categorie": "lanceur",
+            "consommables_utilises": ["bille"],
+            "consommables_fournis": [],
+            "prix_euros": 20,
+            "favori": False,
+        },
+        {
+            "id": "L2",
+            "categorie": "lanceur",
+            "consommables_utilises": ["disque"],
+            "consommables_fournis": [],
+            "prix_euros": 30,
+            "favori": False,
+        },
+        {
+            "id": "M1",
+            "categorie": "munition",
+            "consommables_utilises": [],
+            "consommables_fournis": ["bille"],
+            "prix_euros": 5,
+            "favori": False,
+        },
+        {
+            "id": "M2",
+            "categorie": "munition",
+            "consommables_utilises": [],
+            "consommables_fournis": ["disque", "bille"],
+            "prix_euros": 8,
+            "favori": False,
+        },
     ]
 
 
@@ -235,16 +383,36 @@ def test_filtres_code_inconnu():
 
 def petit_catalogue_liquides():
     return [
-        {"id": "L1", "categorie": "lanceur", "consommables_utilises": ["projectile"],
-         "consommables_fournis": []},
-        {"id": "A1", "categorie": "accessoire", "consommables_utilises": ["liquide-a", "liquide-b"],
-         "consommables_fournis": []},
-        {"id": "M1", "categorie": "munition", "consommables_utilises": ["liquide-a", "liquide-b"],
-         "consommables_fournis": ["projectile"]},
-        {"id": "R1", "categorie": "recharge", "consommables_utilises": [],
-         "consommables_fournis": ["liquide-a"]},
-        {"id": "R2", "categorie": "recharge", "consommables_utilises": [],
-         "consommables_fournis": ["liquide-b"]},
+        {
+            "id": "L1",
+            "categorie": "lanceur",
+            "consommables_utilises": ["projectile"],
+            "consommables_fournis": [],
+        },
+        {
+            "id": "A1",
+            "categorie": "accessoire",
+            "consommables_utilises": ["liquide-a", "liquide-b"],
+            "consommables_fournis": [],
+        },
+        {
+            "id": "M1",
+            "categorie": "munition",
+            "consommables_utilises": ["liquide-a", "liquide-b"],
+            "consommables_fournis": ["projectile"],
+        },
+        {
+            "id": "R1",
+            "categorie": "recharge",
+            "consommables_utilises": [],
+            "consommables_fournis": ["liquide-a"],
+        },
+        {
+            "id": "R2",
+            "categorie": "recharge",
+            "consommables_utilises": [],
+            "consommables_fournis": ["liquide-b"],
+        },
     ]
 
 
@@ -263,34 +431,64 @@ def test_filtres_liquides_sans_association_indirecte():
 
 def test_filtres_projectile_utilise_et_fourni():
     resultat = filtrer_par_consommable(petit_catalogue_liquides(), "projectile")
-    assert [produit["id"] for produit in resultat] == ["L1", "M1"], "Lanceur et munition attendus"
+    assert [produit["id"] for produit in resultat] == ["L1", "M1"], (
+        "Lanceur et munition attendus"
+    )
 
 
 def test_filtres_deux_roles_et_listes_vides():
     catalogue = [
-        {"id": "U", "consommables_utilises": ["utilise-seul"], "consommables_fournis": []},
-        {"id": "F", "consommables_utilises": [], "consommables_fournis": ["fourni-seul"]},
-        {"id": "D", "consommables_utilises": ["double"], "consommables_fournis": ["double"]},
+        {
+            "id": "U",
+            "consommables_utilises": ["utilise-seul"],
+            "consommables_fournis": [],
+        },
+        {
+            "id": "F",
+            "consommables_utilises": [],
+            "consommables_fournis": ["fourni-seul"],
+        },
+        {
+            "id": "D",
+            "consommables_utilises": ["double"],
+            "consommables_fournis": ["double"],
+        },
         {"id": "V", "consommables_utilises": [], "consommables_fournis": []},
     ]
-    assert consommables_disponibles(catalogue) == {"utilise-seul", "fourni-seul", "double"}
+    assert consommables_disponibles(catalogue) == {
+        "utilise-seul",
+        "fourni-seul",
+        "double",
+    }
     for code, position in [("utilise-seul", 0), ("fourni-seul", 1), ("double", 2)]:
         resultat = filtrer_par_consommable(catalogue, code)
-        assert len(resultat) == 1, f"{code} : un seul produit attendu, obtenu {resultat}"
+        assert len(resultat) == 1, (
+            f"{code} : un seul produit attendu, obtenu {resultat}"
+        )
         assert resultat[0] is catalogue[position], f"{code} : produit original attendu"
-    assert consommables_disponibles([catalogue[3]]) == set(), "Deux listes vides ne donnent aucun code"
-    assert filtrer_par_consommable([catalogue[3]], "double") == [], "Aucune correspondance attendue"
+    assert consommables_disponibles([catalogue[3]]) == set(), (
+        "Deux listes vides ne donnent aucun code"
+    )
+    assert filtrer_par_consommable([catalogue[3]], "double") == [], (
+        "Aucune correspondance attendue"
+    )
 
 
 def test_filtres_catalogue_vide():
-    assert consommables_disponibles([]) == set(), "Un catalogue vide ne contient aucun code"
-    assert filtrer_par_consommable([], "liquide-a") == [], "Un catalogue vide ne contient aucun produit"
+    assert consommables_disponibles([]) == set(), (
+        "Un catalogue vide ne contient aucun code"
+    )
+    assert filtrer_par_consommable([], "liquide-a") == [], (
+        "Un catalogue vide ne contient aucun produit"
+    )
 
 
 def test_filtres_codes_sans_mutation():
     catalogue = petit_catalogue_liquides()
     consommables_disponibles(catalogue)
-    assert catalogue == petit_catalogue_liquides(), "La collecte des codes a modifié le catalogue"
+    assert catalogue == petit_catalogue_liquides(), (
+        "La collecte des codes a modifié le catalogue"
+    )
 
 
 def test_filtres_liste_nouvelle_produits_identiques():
@@ -300,7 +498,9 @@ def test_filtres_liste_nouvelle_produits_identiques():
     assert resultat is not catalogue, "Le filtre doit construire une nouvelle liste"
     assert len(resultat) == 3, f"Trois produits attendus, obtenu : {len(resultat)}"
     for produit, position in zip(resultat, [1, 2, 3]):
-        assert produit is catalogue[position], "Le filtre ne doit pas copier les dictionnaires"
+        assert produit is catalogue[position], (
+            "Le filtre ne doit pas copier les dictionnaires"
+        )
 
 
 def test_budget_plusieurs_conditionnements():
@@ -332,15 +532,36 @@ def test_favoris_activer_puis_desactiver():
 
 def catalogue_recherche():
     return [
-        {"id": "L1", "nom": "Lanceur", "description": "Pour une bille.",
-         "categorie": "lanceur", "prix_euros": 20, "poids_g": 800,
-         "dimensions_cm": {"longueur": 50}, "favori": False},
-        {"id": "A1", "nom": "Brume", "description": "Accessoire de poche.",
-         "categorie": "accessoire", "prix_euros": 15, "poids_g": 300,
-         "dimensions_cm": {"longueur": 4}, "favori": False},
-        {"id": "M1", "nom": "Billes", "description": "Pour le LANCEUR.",
-         "categorie": "munition", "prix_euros": 5, "poids_g": 100,
-         "dimensions_cm": {"longueur": 10}, "favori": False},
+        {
+            "id": "L1",
+            "nom": "Lanceur",
+            "description": "Pour une bille.",
+            "categorie": "lanceur",
+            "prix_euros": 20,
+            "poids_g": 800,
+            "dimensions_cm": {"longueur": 50},
+            "favori": False,
+        },
+        {
+            "id": "A1",
+            "nom": "Brume",
+            "description": "Accessoire de poche.",
+            "categorie": "accessoire",
+            "prix_euros": 15,
+            "poids_g": 300,
+            "dimensions_cm": {"longueur": 4},
+            "favori": False,
+        },
+        {
+            "id": "M1",
+            "nom": "Billes",
+            "description": "Pour le LANCEUR.",
+            "categorie": "munition",
+            "prix_euros": 5,
+            "poids_g": 100,
+            "dimensions_cm": {"longueur": 10},
+            "favori": False,
+        },
     ]
 
 
@@ -449,17 +670,28 @@ def test_audio_reference_silencieuse_partage_et_plusieurs_sons():
     assert sons_pour_produit("M1", associations) == ["sons/couac.wav", "sons/ding.wav"]
     assert sons_pour_produit("SILENCE", associations) == []
     assert sons_pour_produit("L1", {}) == []
-    assert associations == {"L1": ["sons/couac.wav"], "M1": ["sons/couac.wav", "sons/ding.wav"]}
+    assert associations == {
+        "L1": ["sons/couac.wav"],
+        "M1": ["sons/couac.wav", "sons/ding.wav"],
+    }
 
 
 def test_audio_associations_des_produits():
     attendus = {
-        "BB-01": "tampon-administratif", "BB-02": "rire-requin", "BB-03": "montee-niveau",
-        "BB-04": "jingle-brume", "BB-05": "coin-coin", "BB-06": "ding-reunion",
-        "BB-07": "clochette-boulangerie", "BB-08": "bourdonnement-orbe",
-        "RE-02": "sifflement-mini-requin", "RE-04": "coin-coin",
+        "BB-01": "tampon-administratif",
+        "BB-02": "rire-requin",
+        "BB-03": "montee-niveau",
+        "BB-04": "jingle-brume",
+        "BB-05": "coin-coin",
+        "BB-06": "ding-reunion",
+        "BB-07": "clochette-boulangerie",
+        "BB-08": "bourdonnement-orbe",
+        "RE-02": "sifflement-mini-requin",
+        "RE-04": "coin-coin",
     }
-    assert SONS_PRODUITS == {identifiant: [f"sons/{nom}.wav"] for identifiant, nom in attendus.items()}
+    assert SONS_PRODUITS == {
+        identifiant: [f"sons/{nom}.wav"] for identifiant, nom in attendus.items()
+    }
 
 
 # Lancement des tests
@@ -467,12 +699,22 @@ def test_audio_associations_des_produits():
 
 def tests_du_groupe(groupe):
     if groupe != "perso":
-        return [fonction for nom, fonction in globals().items() if nom.startswith(f"test_{groupe}_")]
+        return [
+            fonction
+            for nom, fonction in globals().items()
+            if nom.startswith(f"test_{groupe}_")
+        ]
     module = importlib.import_module("tests_perso")
-    tests = {nom: fonction for nom, fonction in vars(module).items() if nom.startswith("test_") and callable(fonction)}
+    tests = {
+        nom: fonction
+        for nom, fonction in vars(module).items()
+        if nom.startswith("test_") and callable(fonction)
+    }
     manquants = TESTS_OBLIGATOIRES - tests.keys()
     if manquants:
-        raise AssertionError(f"Tests obligatoires absents : {', '.join(sorted(manquants))}")
+        raise AssertionError(
+            f"Tests obligatoires absents : {', '.join(sorted(manquants))}"
+        )
     return list(tests.values())
 
 
@@ -481,12 +723,18 @@ def lancer(groupe):
     try:
         tests = tests_du_groupe(groupe)
     except Exception as erreur:
-        print(f"  ERREUR       import de tests_perso.py : {type(erreur).__name__}: {erreur}")
+        print(
+            f"  ERREUR       import de tests_perso.py : {type(erreur).__name__}: {erreur}"
+        )
         if isinstance(erreur, SyntaxError):
-            print(f"               ligne {erreur.lineno} : {(erreur.text or '').strip()}")
+            print(
+                f"               ligne {erreur.lineno} : {(erreur.text or '').strip()}"
+            )
         else:
             cadre = traceback.extract_tb(erreur.__traceback__)[-1]
-            print(f"               {cadre.filename.split('/')[-1]}, ligne {cadre.lineno} : {cadre.line}")
+            print(
+                f"               {cadre.filename.split('/')[-1]}, ligne {cadre.lineno} : {cadre.line}"
+            )
         return {"ok": 0, "echec": 1, "a_completer": 0}
     if not tests:
         print("  Aucun test pour le moment.")
@@ -502,13 +750,17 @@ def lancer(groupe):
             print(f"  ÉCHEC        {test.__name__}")
             print(f"               {erreur}")
             cadres = traceback.extract_tb(erreur.__traceback__)
-            ligne = [cadre for cadre in cadres if cadre.filename == test.__code__.co_filename][-1]
+            ligne = [
+                cadre for cadre in cadres if cadre.filename == test.__code__.co_filename
+            ][-1]
             print(f"               ligne {ligne.lineno} : {ligne.line}")
         except Exception as erreur:
             bilan["echec"] += 1
             cadre = traceback.extract_tb(erreur.__traceback__)[-1]
             print(f"  ERREUR       {test.__name__} : {type(erreur).__name__}: {erreur}")
-            print(f"               {cadre.filename.split('/')[-1]}, ligne {cadre.lineno} : {cadre.line}")
+            print(
+                f"               {cadre.filename.split('/')[-1]}, ligne {cadre.lineno} : {cadre.line}"
+            )
         else:
             bilan["ok"] += 1
             print(f"  OK           {test.__name__}")
@@ -519,13 +771,17 @@ def main(arguments):
     disponibles = GROUPES + BONUS
     inconnus = [groupe for groupe in arguments if groupe not in disponibles]
     if inconnus:
-        print(f"Groupe inconnu : {', '.join(inconnus)}. Groupes disponibles : {', '.join(disponibles)}.")
+        print(
+            f"Groupe inconnu : {', '.join(inconnus)}. Groupes disponibles : {', '.join(disponibles)}."
+        )
         return 2
     total = {"ok": 0, "echec": 0, "a_completer": 0}
     for groupe in arguments or GROUPES:
         for cle, valeur in lancer(groupe).items():
             total[cle] += valeur
-    print(f"\nBilan : {total['ok']} OK, {total['echec']} en échec, {total['a_completer']} à compléter.")
+    print(
+        f"\nBilan : {total['ok']} OK, {total['echec']} en échec, {total['a_completer']} à compléter."
+    )
     return 1 if total["echec"] or total["a_completer"] else 0
 
 
