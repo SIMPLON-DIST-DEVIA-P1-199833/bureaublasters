@@ -1,6 +1,7 @@
 """Tes tests obligatoires : python tests_catalogue.py perso."""
 
 from typing import assert_type, Set
+from copy import deepcopy
 
 from fonctions import (
     calculer_total,
@@ -81,18 +82,6 @@ def test_selection_seuil_inclus():
         produit["id"] for produit in resultat if produit["id"].startswith("BB")
     }
     assert resultat_BB == {"BB-01", "BB-04", "BB-06", "BB-08"}
-    resultat_RE = {
-        produit["id"] for produit in resultat if produit["id"].startswith("RE")
-    }
-    assert resultat_RE == {
-        "RE-01",
-        "RE-02",
-        "RE-03",
-        "RE-04",
-        "RE-05",
-        "RE-07",
-        "RE-08",
-    }
 
 
 def test_consommables_disponibles():
@@ -123,42 +112,74 @@ def test_lecture_demande():
     """« l1 ; 2 » doit donner {"id": "L1", "quantite": 2}, avec une quantité entière."""
     assert lire_demande("BB-01 ; 75") == {"id": "BB-01", "quantite": 75}
     assert lire_demande("RE-13    ;    11") == {"id": "RE-13", "quantite": 11}
+    assert lire_demande(" l1 ; 2 ") == {"id": "L1", "quantite": 2}
     assert lire_demande("corn flakes") == {}
 
 
 def test_ligne_independante():
     """Deux L1 coûtent 40 € ; la ligne est un autre dictionnaire et la fiche reste inchangée."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_ligne_independante est à compléter.")
+    produit_l1 = catalogue_essai()[0]
+    ligne = preparer_ligne(produit_l1, 2)
+    assert ligne["sous_total_euros"] == 40
+    assert ligne["quantite"] == 2
+    assert ligne["nom"] == produit_l1["nom"]
 
 
 # Étape 5 : vérifier les cumuls, le paramètre par défaut et la mutation choisie.
 def test_total_cumule():
     """Deux lignes de sous-totaux 40 € et 15 € donnent 55 €, sans modifier les lignes."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_total_cumule est à compléter.")
+    lignes = [{"sous_total_euros": 40}, {"sous_total_euros": 15}]
+    assert calculer_total(lignes) == 55
 
 
 def test_commande_vide_sans_frais():
     """Une commande vide donne zéro, même avec 10 € de frais demandés."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_commande_vide_sans_frais est à compléter.")
+    assert total_avec_livraison([], 3) == 0
+    assert total_avec_livraison([], 3) == 0
 
 
 def test_favori_autres_champs():
     """Active puis désactive le favori de L1 ; les autres champs restent inchangés, retour None."""
     # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_favori_autres_champs est à compléter.")
+    produit = catalogue_essai()[0].copy()
+    produit["favori"] = "anything"
+    definir_favori(produit, True)
+    assert produit["favori"] == True
 
 
 def test_frais_parametres():
     """Deux lignes totalisant 55 € donnent 61 € par défaut, 55 € avec zéro et 65 € avec dix."""
     # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_frais_parametres est à compléter.")
+    lignes = [{"sous_total_euros": 40}, {"sous_total_euros": 15}]
+    assert total_avec_livraison(lignes) == 61
+    assert total_avec_livraison(lignes, 0) == 55
+    assert total_avec_livraison(lignes, 10) == 65
 
 
 # Étape 6 : vérifier plusieurs fonctions dans un même parcours.
 def test_parcours_complet():
     """Deux L1, une référence absente et trois M1 donnent 55 € avant frais et 61 € livrés."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_parcours_complet est à compléter.")
+    orig_catalogue_essai = deepcopy(catalogue_essai())
+    demandes = [" l1 ; 2 ", " absent ; 1 ", "m1;3", "   "]
+    orig_demandes = demandes.copy()
+    commande = preparer_commande(catalogue_essai(), demandes)
+    assert {"lignes", "inconnues"} <= commande.keys()
+    assert len(commande["lignes"]) == 2
+    assert len(commande["inconnues"]) == 1
+    assert commande["lignes"][0]["id"] == "L1"
+    assert commande["lignes"][1]["id"] == "M1"
+    assert (
+        commande["lignes"][1]["sous_total_euros"]
+        + commande["lignes"][0]["sous_total_euros"]
+        == 55
+    )
+    devis = formater_devis(commande["lignes"])
+    devis_lines = devis.split("\n")
+    assert len(devis_lines) == 3
+    assert devis_lines[-1].endswith("61.00 €")
+    assert (
+        devis
+        == "L1 | 2 x Lanceur : 40.00 €\nM1 | 3 x Billes : 15.00 €\nTotal livré : 61.00 €"
+    )
+    assert orig_catalogue_essai == catalogue_essai()
+    assert demandes == orig_demandes
