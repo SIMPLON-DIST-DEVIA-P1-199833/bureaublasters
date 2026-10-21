@@ -121,20 +121,13 @@ def preparer_commande(catalogue, demandes):
         if demand != [""] and not demand.isspace():
             res = lire_demande(demand)
             our_demands.append(res)
-            # print(our_demands)
     for demand in our_demands:
         product = trouver_produit(catalogue, demand["id"])
         if product == None:
             all_commands["inconnues"].append(demand["id"])
         else:
             all_commands["lignes"].append(preparer_ligne(product, demand["quantite"]))
-    # print(all_commands)
-    # result = [p["id"] for p in all_commands["lignes"]]
-    # assert result == ["M1", "L1"], "WTF BRO"
-    # print([p["id"] for p in all_commands["lignes"]])
-    print(all_commands)
     return all_commands
-    # raise NotImplementedError("preparer_commande est à compléter.")
 
 
 # Étape 5 : réutiliser les résultats et choisir les effets sur les données.

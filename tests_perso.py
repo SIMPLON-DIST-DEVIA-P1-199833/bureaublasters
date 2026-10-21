@@ -205,16 +205,3 @@ def test_parcours_complet():
     """Deux L1, une référence absente et trois M1 donnent 55 € avant frais et 61 € livrés."""
     # À compléter : suis le contrat et les vérifications de cette étape dans le README.
     raise NotImplementedError("test_parcours_complet est à compléter.")
-
-
-# test_recherche_normalisee()
-# test_selection_seuil_inclus()
-# print("Test - consommables_disponibles")
-# test_consommables_disponibles()
-# print("Test - filter_par_consommable")
-# test_filtrer_par_consommable()
-# print("Test - consommable_sans_fournisseur")
-# test_consommable_sans_fournisseur()
-# print("Test - lecture_demande")
-# test_lecture_demande()
-test_ligne_independante()
