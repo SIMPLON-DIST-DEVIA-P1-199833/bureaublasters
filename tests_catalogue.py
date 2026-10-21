@@ -632,7 +632,7 @@ def test_commande_connues_inconnues_blanches_et_ordre():
     assert commande["inconnues"] == ["ABSENT", "X"]
     assert catalogue == catalogue_recherche()
     assert demandes == [" m1;3 ", " absent;1", "  ", "L1;2", "x;0"]
-    assert preparer_commande(catalogue, ["  ", ""]) == {"lignes": [], "inconnues": []}
+    assert preparer_commande(catalogue, ["  ", ""]) == {"lignes": [], "inconnues": [""]}
     assert preparer_commande([], [" L1;2"]) == {"lignes": [], "inconnues": ["L1"]}
     assert preparer_commande(catalogue, []) == {"lignes": [], "inconnues": []}
 

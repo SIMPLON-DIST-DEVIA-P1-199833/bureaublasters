@@ -124,7 +124,6 @@ def test_selection_seuil_inclus():
     )
     result2 = selectionner_equipements(catalogue, 20, 799, 50)
     assert result2 == [], f"Expected [], got: {result2}"
-    # raise NotImplementedError("test_selection_seuil_inclus est à compléter.")
 
 
 # Étape 3 : comparer les besoins aux références fournies.
@@ -135,14 +134,12 @@ def test_consommables_disponibles():
     assert result == {"bille", "liquide"}, (
         f"Expected {{''bille'', ''liquide''}}, got: {result}"
     )
-    print(result)
 
 
 def test_filtrer_par_consommable():
     catalogue = catalogue_essai()
     result = filtrer_par_consommable(catalogue, "bille")
-    print(result)
-    assert result == ["L1", "M1"], f"Expected ['L1', 'M1'], got: {result}"
+    assert result == [catalogue[0], catalogue[2]]
 
 
 def test_consommable_sans_fournisseur():
@@ -151,20 +148,31 @@ def test_consommable_sans_fournisseur():
     result = consommables_sans_offre(catalogue)
     assert type(result) == set, f"Expected result to be a set, not a {type(result)}"
     assert result == {"liquide"}, f"Expected result to be {{'liquide'}}, not: {result}"
-    print(result)
 
 
 # Étape 4 : contrôler la conversion et la copie d'une fiche.
 def test_lecture_demande():
     """« l1 ; 2 » doit donner {"id": "L1", "quantite": 2}, avec une quantité entière."""
     # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_lecture_demande est à compléter.")
+    texte = " l1 ; 2 "
+    result = lire_demande(texte)
+    assert result == {"id": "L1", "quantite": 2}, (
+        f"Expected {{'id': 'L1', 'quantite': 2}}, got: {result}"
+    )
 
 
 def test_ligne_independante():
     """Deux L1 coûtent 40 € ; la ligne est un autre dictionnaire et la fiche reste inchangée."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_ligne_independante est à compléter.")
+    catalogue = catalogue_essai()
+    result = preparer_ligne(catalogue[0], 2)
+    assert (
+        result["prix_euros"] == 20
+        and result["quantite"] == 2
+        and result["sous_total_euros"] == 40
+        and result is not catalogue[0]
+    )
+    catalogue2 = catalogue_essai()
+    assert result is not catalogue2[0]
 
 
 # Étape 5 : vérifier les cumuls, le paramètre par défaut et la mutation choisie.
@@ -201,9 +209,12 @@ def test_parcours_complet():
 
 # test_recherche_normalisee()
 # test_selection_seuil_inclus()
-print("Test - consommables_disponibles")
-test_consommables_disponibles()
-print("Test - filter_par_consommable")
-test_filtrer_par_consommable()
-print("Test - consommable_sans_fournisseur")
-test_consommable_sans_fournisseur()
+# print("Test - consommables_disponibles")
+# test_consommables_disponibles()
+# print("Test - filter_par_consommable")
+# test_filtrer_par_consommable()
+# print("Test - consommable_sans_fournisseur")
+# test_consommable_sans_fournisseur()
+# print("Test - lecture_demande")
+# test_lecture_demande()
+test_ligne_independante()
