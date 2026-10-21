@@ -32,6 +32,7 @@ def catalogue_essai():
 
 
 # Étape 2 : comparer les références et vérifier une frontière.
+# A proper test always has assert !!!
 def test_recherche_normalisee():
     """Avec catalogue_essai(), «  LANCEUR  » et « lanceur » doivent retrouver L1 et M1."""
     catalogue = catalogue_essai()
@@ -39,22 +40,48 @@ def test_recherche_normalisee():
     identifiants = []
     for produit in resultat:
         identifiants.append(produit["id"])
-    # À compléter : compare les identifiants et le résultat de la recherche normalisée.
-    raise NotImplementedError("test_recherche_normalisee est à compléter.")
-
+    assert identifiants == ["L1", "M1"], (
+        f"(  LANCEUR  ) -> attendu ['L1', 'M1'], obtenu {identifiants}"
+    )
 
 def test_selection_seuil_inclus():
     """Avec les maxima 20 €, 800 g et 50 cm, seule L1 convient ; A1 dépasse le poids."""
     # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_selection_seuil_inclus est à compléter.")
+    catalogue = catalogue_essai()
+
+    resultat = selectionner_equipements(catalogue, 20, 800, 50)
+    identifiants = []
+    for produit in resultat:
+        identifiants.append(produit["id"])
+    assert identifiants == ["L1"], (
+        f"(20, 800, 50) -> attendu ['L1'], obtenu {identifiants}"
+    )
+
+#Un g de moins
+    resultat_799 = selectionner_equipements(catalogue, 20, 799, 50)
+    identifiants_799 = []
+    for produit in resultat_799:
+        identifiants_799.append(produit["id"])
+    assert identifiants_799 == [], (
+        f"(20, 799, 50) -> attendu [], obtenu {identifiants_799}"
+    )
 
 
 # Étape 3 : comparer les besoins aux références fournies.
 def test_consommable_sans_fournisseur():
     """catalogue_essai() utilise « liquide » sans fournisseur ; seul ce code est attendu."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_consommable_sans_fournisseur est à compléter.")
-
+    set_no_provider = set()
+    catalogue = catalogue_essai()
+    fournis = set()
+    for item in catalogue:
+        fournis.update(item["consommables_fournis"])
+    utilises = set()
+    for item in catalogue:
+        utilises.update(item["consommables_utilises"])
+    set_no_provider = utilises - fournis
+    print("orphelins :", set_no_provider)
+    assert set_no_provider == {"liquide"}
+    print("OK")
 
 # Étape 4 : contrôler la conversion et la copie d'une fiche.
 def test_lecture_demande():
