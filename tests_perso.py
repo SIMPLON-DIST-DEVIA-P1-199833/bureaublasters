@@ -40,7 +40,11 @@ def test_recherche_normalisee():
     for produit in resultat:
         identifiants.append(produit["id"])
     # À compléter : compare les identifiants et le résultat de la recherche normalisée.
-    raise NotImplementedError("test_recherche_normalisee est à compléter.")
+    assert identifiants == ["L1", "M1"], f"L1 et M1 attendus, obtenu : {identifiants}"
+
+    resultat_simple = rechercher_produits(catalogue, "lanceur")
+    assert resultat_simple == resultat, "Les deux recherches doivent donner le même résultat"
+    # raise NotImplementedError("test_recherche_normalisee est à compléter.")
 
 
 def test_selection_seuil_inclus():
