@@ -39,21 +39,46 @@ def test_recherche_normalisee():
     identifiants = []
     for produit in resultat:
         identifiants.append(produit["id"])
-    # À compléter : compare les identifiants et le résultat de la recherche normalisée.
-    raise NotImplementedError("test_recherche_normalisee est à compléter.")
+    resultat_attendus = ["L1", "M1"]
+    assert identifiants == resultat_attendus
+    resultat_sans_espaces = rechercher_produits(catalogue, "lanceur")
+    identifiants_sans_espaces = []
+    for produit in resultat_sans_espaces:
+        identifiants_sans_espaces.append(produit["id"])
+    assert identifiants_sans_espaces == resultat_attendus
+    assert resultat == resultat_sans_espaces
+
 
 
 def test_selection_seuil_inclus():
     """Avec les maxima 20 €, 800 g et 50 cm, seule L1 convient ; A1 dépasse le poids."""
     # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_selection_seuil_inclus est à compléter.")
+    catalogue = catalogue_essai()
+    resultat = selectionner_equipements(catalogue, 20, 800, 50)
+    identifiants = []
+    for produit in resultat :
+        identifiants.append(produit["id"])
+    resultat_attendus = ["L1"]
+    assert identifiants == resultat_attendus
+    resultat_799 = selectionner_equipements(catalogue, 20, 799, 50)
+    identifiants_799 = []
+    for produit in resultat_799 :
+        identifiants_799.append(produit["id"])
+    resultat_attendus_799 = []
+    assert identifiants_799 == resultat_attendus_799
+    
+
 
 
 # Étape 3 : comparer les besoins aux références fournies.
 def test_consommable_sans_fournisseur():
     """catalogue_essai() utilise « liquide » sans fournisseur ; seul ce code est attendu."""
     # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_consommable_sans_fournisseur est à compléter.")
+    catalogue = catalogue_essai()
+    resultat = consommables_sans_offre(catalogue)
+    resultat_attendus = {"liquide"}
+    assert resultat == resultat_attendus
+
 
 
 # Étape 4 : contrôler la conversion et la copie d'une fiche.

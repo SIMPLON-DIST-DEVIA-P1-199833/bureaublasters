@@ -5,12 +5,31 @@
 def rechercher_produits(catalogue, recherche):
     """Retourne les fiches dont le nom ou la description contient la recherche nettoyée."""
     # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("rechercher_produits est à compléter.")
+    recherche_nettoyee = recherche.lower().strip()
+    produit_trouve = []
+    for produit in catalogue :
+        if recherche_nettoyee in produit["nom"].lower() or recherche_nettoyee in produit["description"].lower():
+            produit_trouve.append(produit)
+    return produit_trouve
+
 
 
 def selectionner_equipements(catalogue, prix_max, poids_max_g, longueur_max_cm):
     """Retourne les lanceurs et accessoires respectant les trois maxima inclusifs."""
     # À compléter : suis le contrat et les vérifications de cette étape dans le README.
+    selection_equipement = []
+    for produit in catalogue :
+        if (
+            (
+                produit["categorie"] == "lanceur" 
+                or produit["categorie"] == "accessoire"
+            )
+            and produit["prix_euros"] <= prix_max 
+            and produit["poids_g"] <= poids_max_g 
+            and produit["dimensions_cm"]["longueur"] <= longueur_max_cm 
+            ) :
+            selection_equipement.append(produit)
+    return selection_equipement
     raise NotImplementedError("selectionner_equipements est à compléter.")
 
 
@@ -18,18 +37,39 @@ def selectionner_equipements(catalogue, prix_max, poids_max_g, longueur_max_cm):
 def consommables_disponibles(catalogue):
     """Retourne les codes utilisés ou fournis, sans doublons ni mutation."""
     # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("consommables_disponibles est à compléter.")
+    disponible = set()
+    for produit in catalogue:
+        for code in produit["consommables_utilises"]:
+            disponible.add(code)
+        for code in produit["consommables_fournis"]:
+            disponible.add(code)
+    return disponible
+
 
 
 def filtrer_par_consommable(catalogue, code):
     """Retourne une nouvelle liste des utilisateurs et fournisseurs du code, dans l'ordre."""
     # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("filtrer_par_consommable est à compléter.")
+    liste_produits = []
+    for produit in catalogue:
+        if code in produit["consommables_utilises"] or code in produit["consommables_fournis"] :
+            liste_produits.append(produit)
+    return liste_produits 
 
 
 def consommables_sans_offre(catalogue):
     """Retourne les codes utilisés par un produit mais fournis par aucune référence."""
     # À compléter : suis le contrat et les vérifications de cette étape dans le README.
+    besoins = set()
+    offres = set()
+    for produit in catalogue:
+        for code in produit["consommables_utilises"]:
+            besoins.add(code)
+        for code in produit["consommables_fournis"]:
+            offres.add(code)
+    difference = besoins - offres
+    return difference
+
     raise NotImplementedError("consommables_sans_offre est à compléter.")
 
 
