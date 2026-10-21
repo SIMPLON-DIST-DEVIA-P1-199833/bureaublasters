@@ -5,12 +5,31 @@
 def rechercher_produits(catalogue, recherche):
     """Retourne les fiches dont le nom ou la description contient la recherche nettoyée."""
     # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("rechercher_produits est à compléter.")
+    recherche_nettoyee = recherche.lower().strip()
+    produit_trouve = []
+    for produit in catalogue :
+        if recherche_nettoyee in produit["nom"].lower() or recherche_nettoyee in produit["description"].lower():
+            produit_trouve.append(produit)
+    return produit_trouve
+
 
 
 def selectionner_equipements(catalogue, prix_max, poids_max_g, longueur_max_cm):
     """Retourne les lanceurs et accessoires respectant les trois maxima inclusifs."""
     # À compléter : suis le contrat et les vérifications de cette étape dans le README.
+    selection_equipement = []
+    for produit in catalogue :
+        if (
+            (
+                produit["categorie"] == "lanceur" 
+                or produit["categorie"] == "accessoire"
+            )
+            and produit["prix_euros"] <= prix_max 
+            and produit["poids_g"] <= poids_max_g 
+            and produit["dimensions_cm"]["longueur"] <= longueur_max_cm 
+            ) :
+            selection_equipement.append(produit)
+    return selection_equipement
     raise NotImplementedError("selectionner_equipements est à compléter.")
 
 
