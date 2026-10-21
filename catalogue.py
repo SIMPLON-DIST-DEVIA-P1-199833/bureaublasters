@@ -1,7 +1,6 @@
 """Catalogue des produits BureauBlasters."""
 
 # Étape 1 : relire les données ; catalogue_source.txt contient les trois fiches à migrer.
-# À compléter : corriger les fiches existantes et insérer les trois fiches manquantes.
 CATALOGUE = [
     {
         "id": "BB-01",
@@ -387,7 +386,6 @@ CATALOGUE = [
         "image": "images/brume-neutre.jpg",
         "favori": False
     },
-    # À compléter : insérer la fiche RE-08 — Brume girofle-agrumes.
     {
         "id": "RE-08",
         "nom": "Brume girofle-agrumes",
