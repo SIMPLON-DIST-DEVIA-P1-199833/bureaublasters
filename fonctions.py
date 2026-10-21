@@ -4,58 +4,91 @@
 # Étape 2 : nettoyer une recherche et combiner des critères.
 def rechercher_produits(catalogue, recherche):
     """Retourne les fiches dont le nom ou la description contient la recherche nettoyée."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("rechercher_produits est à compléter.")
+    recherche = recherche.strip().lower()
+    resultat = []
+    for produit in catalogue:
+        if recherche in produit["nom"].lower() or recherche in produit["description"].lower():
+            resultat.append(produit)
+    return resultat
 
 
 def selectionner_equipements(catalogue, prix_max, poids_max_g, longueur_max_cm):
     """Retourne les lanceurs et accessoires respectant les trois maxima inclusifs."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("selectionner_equipements est à compléter.")
+    resultat = []
+    for produit in catalogue:
+        if (produit["categorie"] in ["lanceur", "accessoire"]
+                and produit["prix_euros"] <= prix_max
+                and produit["poids_g"] <= poids_max_g
+                and produit["dimensions_cm"]["longueur"] <= longueur_max_cm):
+            resultat.append(produit)
+    return resultat
 
 
 # Étape 3 : réunir les codes, filtrer les fiches et repérer une offre manquante.
 def consommables_disponibles(catalogue):
     """Retourne les codes utilisés ou fournis, sans doublons ni mutation."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("consommables_disponibles est à compléter.")
+    codes = set()
+    for produit in catalogue:
+        for code in produit["consommables_utilises"] + produit["consommables_fournis"]:
+            codes.add(code)
+    return codes
 
 
 def filtrer_par_consommable(catalogue, code):
     """Retourne une nouvelle liste des utilisateurs et fournisseurs du code, dans l'ordre."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("filtrer_par_consommable est à compléter.")
+    resultat = []
+    for produit in catalogue:
+        if code in produit["consommables_utilises"] or code in produit["consommables_fournis"]:
+            resultat.append(produit)
+    return resultat
 
 
 def consommables_sans_offre(catalogue):
     """Retourne les codes utilisés par un produit mais fournis par aucune référence."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("consommables_sans_offre est à compléter.")
+    utilises = set()
+    fournis = set()
+    for produit in catalogue:
+        for code in produit["consommables_utilises"]:
+            utilises.add(code)
+        for code in produit["consommables_fournis"]:
+            fournis.add(code)
+    return utilises - fournis
 
 
 # Étape 4 : transformer chaque demande en une ligne de commande indépendante.
 def trouver_produit(catalogue, identifiant):
     """Retourne la fiche d'identifiant exact, ou None si elle est absente."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("trouver_produit est à compléter.")
+    for produit in catalogue:
+        if produit["id"] == identifiant:
+            return produit
+    return None
 
 
 def lire_demande(texte):
     """Retourne un dictionnaire id/quantite depuis une ligne « identifiant ; entier »."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("lire_demande est à compléter.")
+    champs_nettoye = texte.split(";")
+    
+    identifiant = champs_nettoye[0].strip().upper()
+    quantite = int(champs_nettoye[1].strip())
+    
+    return {
+        "id": identifiant,
+        "quantite": quantite
+    }
 
 
 def calculer_budget(produit, quantite):
     """Retourne le prix de quantite conditionnements, entière positive ou nulle, arrondi à deux décimales."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("calculer_budget est à compléter.")
+    montant = produit["prix_euros"] * quantite
+    return round(montant, 2)
 
 
 def preparer_ligne(produit, quantite):
     """Retourne une copie superficielle de la fiche avec quantite et sous_total_euros."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("preparer_ligne est à compléter.")
+    copie = produit.copy()
+    copie["quantite"] = quantite
+    copie["sous_total_euros"] = calculer_budget(produit, quantite)
+    return copie
 
 
 def preparer_commande(catalogue, demandes):
