@@ -133,26 +133,48 @@ def preparer_commande(catalogue, demandes):
 # Étape 5 : réutiliser les résultats et choisir les effets sur les données.
 def calculer_total(lignes):
     """Retourne la somme des sous-totaux arrondie à deux décimales, ou zéro."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("calculer_total est à compléter.")
+    total = 0
+    for line in lignes:
+        if line["sous_total_euros"]:
+            total += line["sous_total_euros"]
+    return round(total, 2)
 
 
 def total_avec_livraison(lignes, frais_euros=6):
     """Ajoute les frais une seule fois si les lignes ne sont pas vides, sinon retourne zéro."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("total_avec_livraison est à compléter.")
+    total = 0
+    if lignes is not None and len(lignes) > 0:
+        total = frais_euros
+    total += round(calculer_total(lignes), 2)
+    return total
 
 
 def formater_devis(lignes, frais_euros=6):
-    """Retourne le récapitulatif textuel avec deux décimales et un total livré."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("formater_devis est à compléter.")
+    """Retourne le récapitulatif textuel avec deux décimales et un total livré.
+
+    Format:
+    BB-02 | 2 x Requin Arêtes : 978.00 €
+    RE-02 | 3 x Mini-requins fumigènes : 179.70 €
+    RE-08 | 1 x Brume girofle-agrumes : 6.90 €
+    Total livré : 1170.60 €
+    """
+    devis = ""
+    for line in lignes:
+        devis += "".join(
+            f"{line['id']} | {line['quantite']} x {line['nom']} : {line['sous_total_euros']:.2f} €\n"
+        )
+    if devis == "":
+        return "Total livré : 0.00 €"
+    devis += "".join(f"Total livré : {total_avec_livraison(lignes, frais_euros):.2f} €")
+    return devis
 
 
 def definir_favori(produit, favori):
     """Modifie uniquement favori dans le dictionnaire reçu et retourne None."""
     # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("definir_favori est à compléter.")
+    if produit != [] and produit is not None and isinstance(favori, bool):
+        produit["favori"] = favori
+    return None
 
 
 # Bonus audio : retrouver les chemins associés à une référence.

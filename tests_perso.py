@@ -178,26 +178,43 @@ def test_ligne_independante():
 # Étape 5 : vérifier les cumuls, le paramètre par défaut et la mutation choisie.
 def test_total_cumule():
     """Deux lignes de sous-totaux 40 € et 15 € donnent 55 €, sans modifier les lignes."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_total_cumule est à compléter.")
+    all_lines = [{"sous_total_euros": 40}, {"sous_total_euros": 15}]
+    total = calculer_total(all_lines)
+    assert total == 55, f"Expected 55, got: {total}"
+    assert calculer_total([]) == 0
 
 
 def test_commande_vide_sans_frais():
     """Une commande vide donne zéro, même avec 10 € de frais demandés."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_commande_vide_sans_frais est à compléter.")
-
-
-def test_favori_autres_champs():
-    """Active puis désactive le favori de L1 ; les autres champs restent inchangés, retour None."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_favori_autres_champs est à compléter.")
+    assert calculer_total([]) == 0
+    assert total_avec_livraison([], 0) == 0
+    assert total_avec_livraison([], 10) == 0
 
 
 def test_frais_parametres():
     """Deux lignes totalisant 55 € donnent 61 € par défaut, 55 € avec zéro et 65 € avec dix."""
     # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_frais_parametres est à compléter.")
+    lignes = [{"sous_total_euros": 40}, {"sous_total_euros": 15}]
+    assert total_avec_livraison(lignes) == 61
+    assert total_avec_livraison(lignes, frais_euros=0) == 55
+    assert total_avec_livraison(lignes, frais_euros=10) == 65
+    assert total_avec_livraison([], frais_euros=10) == 0
+    assert lignes == [{"sous_total_euros": 40}, {"sous_total_euros": 15}]
+
+
+def test_favori_autres_champs():
+    """Active puis désactive le favori de L1 ; les autres champs restent inchangés, retour None."""
+    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
+    catalogue = petit_catalogue()
+    none_return = definir_favori(catalogue[0], True)
+    assert none_return == None, (
+        f"Expected definir_favori to return None, got : {none_return}"
+    )
+    assert (
+        catalogue[0]["favori"] == True
+        and catalogue[1]["favori"] == False
+        and catalogue[0]["categorie"] == "lanceur"
+    )
 
 
 # Étape 6 : vérifier plusieurs fonctions dans un même parcours.
