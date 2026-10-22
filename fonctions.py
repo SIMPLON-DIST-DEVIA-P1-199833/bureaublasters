@@ -68,14 +68,11 @@ def consommables_sans_offre(catalogue):
             if cons_offered not in offre:
                 offre.add(cons_offered)
     return set(besoin - offre)
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    # raise NotImplementedError("consommables_sans_offre est à compléter.")
 
 
 # Étape 4 : transformer chaque demande en une ligne de commande indépendante.
 def trouver_produit(catalogue, identifiant):
     """Retourne la fiche d'identifiant exact, ou None si elle est absente."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
     for product in catalogue:
         if product["id"] == identifiant:
             return product
@@ -100,8 +97,6 @@ def calculer_budget(produit, quantite):
         return 0
     rounded_num = round((produit["prix_euros"] * quantite), 2)
     return rounded_num
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("calculer_budget est à compléter.")
 
 
 def preparer_ligne(produit, quantite):
@@ -171,7 +166,6 @@ def formater_devis(lignes, frais_euros=6):
 
 def definir_favori(produit, favori):
     """Modifie uniquement favori dans le dictionnaire reçu et retourne None."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
     if produit != [] and produit is not None and isinstance(favori, bool):
         produit["favori"] = favori
     return None

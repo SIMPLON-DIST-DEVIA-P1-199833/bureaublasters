@@ -1,5 +1,6 @@
 """Tes tests obligatoires : python tests_catalogue.py perso."""
 
+from catalogue import CATALOGUE
 from fonctions import (
     calculer_total,
     consommables_sans_offre,
@@ -153,7 +154,6 @@ def test_consommable_sans_fournisseur():
 # Étape 4 : contrôler la conversion et la copie d'une fiche.
 def test_lecture_demande():
     """« l1 ; 2 » doit donner {"id": "L1", "quantite": 2}, avec une quantité entière."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
     texte = " l1 ; 2 "
     result = lire_demande(texte)
     assert result == {"id": "L1", "quantite": 2}, (
@@ -193,7 +193,6 @@ def test_commande_vide_sans_frais():
 
 def test_frais_parametres():
     """Deux lignes totalisant 55 € donnent 61 € par défaut, 55 € avec zéro et 65 € avec dix."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
     lignes = [{"sous_total_euros": 40}, {"sous_total_euros": 15}]
     assert total_avec_livraison(lignes) == 61
     assert total_avec_livraison(lignes, frais_euros=0) == 55
@@ -204,7 +203,6 @@ def test_frais_parametres():
 
 def test_favori_autres_champs():
     """Active puis désactive le favori de L1 ; les autres champs restent inchangés, retour None."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
     catalogue = petit_catalogue()
     none_return = definir_favori(catalogue[0], True)
     assert none_return == None, (
@@ -232,3 +230,15 @@ def test_parcours_complet():
     assert total_avec_livraison(formated_catalogue["lignes"], 6) == 61
     assert catalogue == catalogue_essai()
     assert all_demands == [" l1 ; 2 ", " absent ; 1 ", "m1;3", "   "]
+
+
+def test_favoris_sur_catalogue_complet():
+    none_return = definir_favori(CATALOGUE[0], True)
+    assert none_return == None, (
+        f"Expected definir_favori to return None, got : {none_return}"
+    )
+    assert (
+        CATALOGUE[0]["favori"] == True
+        and CATALOGUE[1]["favori"] == False
+        and CATALOGUE[0]["categorie"] == "lanceur"
+    )
