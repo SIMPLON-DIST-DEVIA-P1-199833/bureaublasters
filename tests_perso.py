@@ -220,5 +220,15 @@ def test_favori_autres_champs():
 # Étape 6 : vérifier plusieurs fonctions dans un même parcours.
 def test_parcours_complet():
     """Deux L1, une référence absente et trois M1 donnent 55 € avant frais et 61 € livrés."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_parcours_complet est à compléter.")
+    catalogue = catalogue_essai()
+    all_demands = [" l1 ; 2 ", " absent ; 1 ", "m1;3", "   "]
+    formated_catalogue = preparer_commande(catalogue, all_demands)
+    assert formated_catalogue["inconnues"] == ["ABSENT"]
+    assert (
+        formated_catalogue["lignes"][0]["id"] == "L1"
+        and formated_catalogue["lignes"][1]["id"] == "M1"
+    )
+    assert calculer_total(formated_catalogue["lignes"]) == 55
+    assert total_avec_livraison(formated_catalogue["lignes"], 6) == 61
+    assert catalogue == catalogue_essai()
+    assert all_demands == [" l1 ; 2 ", " absent ; 1 ", "m1;3", "   "]
