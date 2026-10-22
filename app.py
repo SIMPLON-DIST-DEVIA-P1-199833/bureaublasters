@@ -19,8 +19,10 @@ from fonctions import (
     rechercher_produits,
     selectionner_equipements,
     total_avec_livraison,
+    sons_pour_produit
 )
 # Bonus audio : importe SONS_PRODUITS et sons_pour_produit depuis leurs modules.
+from sons import SONS_PRODUITS
 
 DOSSIER = Path(__file__).parent
 TOUS = "Tous les produits"
@@ -72,6 +74,15 @@ def afficher_produit(produit, cle):
         # Bonus audio : parcours les chemins associés à produit["id"].
         # Pour chaque fichier existant, ajoute st.audio dans cette carte ; sinon affiche son chemin manquant.
         # Documentation : https://docs.streamlit.io/develop/api-reference/media/st.audio
+        chemin_audio = sons_pour_produit(produit["id"], SONS_PRODUITS)
+        if chemin_audio:
+            if Path(chemin_audio[0]).exists():
+                st.audio(chemin_audio[0])
+            else:
+                st.markdown(f"_Oups ! Audio introuvable: {chemin_audio[0]}._")
+        else:
+            st.markdown("_Oups ! Audio non configuré pour cet article._")
+
         st.toggle(
             "Favori", value=bool(produit["favori"]), key=cle,
             on_change=basculer_favori, args=(produit, cle),
