@@ -39,35 +39,37 @@ def test_recherche_normalisee():
     identifiants = []
     for produit in resultat:
         identifiants.append(produit["id"])
-    # À compléter : compare les identifiants et le résultat de la recherche normalisée.
-    raise NotImplementedError("test_recherche_normalisee est à compléter.")
+    assert identifiants == ["L1", "M1"], f"Obtenu : {identifiants}"
+    assert resultat == rechercher_produits(catalogue, "lanceur")
 
 
 def test_selection_seuil_inclus():
     """Avec les maxima 20 €, 800 g et 50 cm, seule L1 convient ; A1 dépasse le poids."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_selection_seuil_inclus est à compléter.")
+    resultat = selectionner_equipements(catalogue_essai(), 20, 800, 50)
+    assert resultat == [catalogue_essai()[0]], f"Obtenu : {resultat}"
+    assert selectionner_equipements(catalogue_essai(), 20, 799, 50) == []
 
 
 # Étape 3 : comparer les besoins aux références fournies.
 def test_consommable_sans_fournisseur():
     """catalogue_essai() utilise « liquide » sans fournisseur ; seul ce code est attendu."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_consommable_sans_fournisseur est à compléter.")
+    resultat = consommables_sans_offre(catalogue_essai())
+    assert resultat == {"liquide"}, f"Obtenu : {resultat}"
 
 
 # Étape 4 : contrôler la conversion et la copie d'une fiche.
 def test_lecture_demande():
     """« l1 ; 2 » doit donner {"id": "L1", "quantite": 2}, avec une quantité entière."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_lecture_demande est à compléter.")
+    resultat = lire_demande(" l1 ; 2 ")
+    
+    assert resultat == {"id": "L1", "quantite": 2}
+    assert type(resultat["quantite"]) == int
 
 
 def test_ligne_independante():
     """Deux L1 coûtent 40 € ; la ligne est un autre dictionnaire et la fiche reste inchangée."""
     # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_ligne_independante est à compléter.")
-
+    raise NotImplementedError("test_commande_vide_sans_frais est à compléter.")
 
 # Étape 5 : vérifier les cumuls, le paramètre par défaut et la mutation choisie.
 def test_total_cumule():
