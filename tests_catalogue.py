@@ -522,7 +522,7 @@ def main(arguments):
         print(f"Groupe inconnu : {', '.join(inconnus)}. Groupes disponibles : {', '.join(disponibles)}.")
         return 2
     total = {"ok": 0, "echec": 0, "a_completer": 0}
-    for groupe in arguments or GROUPES:
+    for groupe in arguments or disponibles: # was 'or GROUPES'
         for cle, valeur in lancer(groupe).items():
             total[cle] += valeur
     print(f"\nBilan : {total['ok']} OK, {total['echec']} en échec, {total['a_completer']} à compléter.")
