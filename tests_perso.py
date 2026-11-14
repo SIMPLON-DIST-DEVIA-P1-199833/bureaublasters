@@ -1,5 +1,6 @@
 """Tes tests obligatoires : python tests_catalogue.py perso."""
 
+from catalogue import CATALOGUE
 from fonctions import (
     calculer_total,
     consommables_sans_offre,
@@ -11,23 +12,86 @@ from fonctions import (
     rechercher_produits,
     selectionner_equipements,
     total_avec_livraison,
+    consommables_disponibles,
+    filtrer_par_consommable,
 )
+
+
+def petit_catalogue():
+    return [
+        {
+            "id": "L1",
+            "categorie": "lanceur",
+            "consommables_utilises": ["bille"],
+            "consommables_fournis": [],
+            "prix_euros": 20,
+            "favori": False,
+        },
+        {
+            "id": "L2",
+            "categorie": "lanceur",
+            "consommables_utilises": ["disque"],
+            "consommables_fournis": [],
+            "prix_euros": 30,
+            "favori": False,
+        },
+        {
+            "id": "M1",
+            "categorie": "munition",
+            "consommables_utilises": [],
+            "consommables_fournis": ["bille"],
+            "prix_euros": 5,
+            "favori": False,
+        },
+        {
+            "id": "M2",
+            "categorie": "munition",
+            "consommables_utilises": [],
+            "consommables_fournis": ["disque", "bille"],
+            "prix_euros": 8,
+            "favori": False,
+        },
+    ]
 
 
 def catalogue_essai():
     return [
-        {"id": "L1", "nom": "Lanceur", "description": "Propulse une bille.",
-         "categorie": "lanceur", "prix_euros": 20, "poids_g": 800,
-         "dimensions_cm": {"longueur": 50}, "favori": False,
-         "consommables_utilises": ["bille"], "consommables_fournis": []},
-        {"id": "A1", "nom": "Brume", "description": "Un accessoire de poche.",
-         "categorie": "accessoire", "prix_euros": 15, "poids_g": 801,
-         "dimensions_cm": {"longueur": 10}, "favori": False,
-         "consommables_utilises": ["liquide"], "consommables_fournis": []},
-        {"id": "M1", "nom": "Billes", "description": "Pour le lanceur.",
-         "categorie": "munition", "prix_euros": 5, "poids_g": 100,
-         "dimensions_cm": {"longueur": 10}, "favori": False,
-         "consommables_utilises": [], "consommables_fournis": ["bille"]},
+        {
+            "id": "L1",
+            "nom": "Lanceur",
+            "description": "Propulse une bille.",
+            "categorie": "lanceur",
+            "prix_euros": 20,
+            "poids_g": 800,
+            "dimensions_cm": {"longueur": 50},
+            "favori": False,
+            "consommables_utilises": ["bille"],
+            "consommables_fournis": [],
+        },
+        {
+            "id": "A1",
+            "nom": "Brume",
+            "description": "Un accessoire de poche.",
+            "categorie": "accessoire",
+            "prix_euros": 15,
+            "poids_g": 801,
+            "dimensions_cm": {"longueur": 10},
+            "favori": False,
+            "consommables_utilises": ["liquide"],
+            "consommables_fournis": [],
+        },
+        {
+            "id": "M1",
+            "nom": "Billes",
+            "description": "Pour le lanceur.",
+            "categorie": "munition",
+            "prix_euros": 5,
+            "poids_g": 100,
+            "dimensions_cm": {"longueur": 10},
+            "favori": False,
+            "consommables_utilises": [],
+            "consommables_fournis": ["bille"],
+        },
     ]
 
 
@@ -37,65 +101,144 @@ def test_recherche_normalisee():
     catalogue = catalogue_essai()
     resultat = rechercher_produits(catalogue, "  LANCEUR  ")
     identifiants = []
+
     for produit in resultat:
         identifiants.append(produit["id"])
-    # À compléter : compare les identifiants et le résultat de la recherche normalisée.
-    raise NotImplementedError("test_recherche_normalisee est à compléter.")
+    assert identifiants == ["L1", "M1"], f"Expected ['L1', 'M1'], got: {identifiants}"
+
+    resultat2 = rechercher_produits(catalogue, "  LANCEUR  ")
+    identifiants2 = []
+    for produit in resultat2:
+        identifiants2.append(produit["id"])
+    assert identifiants == identifiants2, (
+        f"Expected same result, got: {identifiants} != {identifiants2}"
+    )
+    return identifiants
 
 
 def test_selection_seuil_inclus():
     """Avec les maxima 20 €, 800 g et 50 cm, seule L1 convient ; A1 dépasse le poids."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_selection_seuil_inclus est à compléter.")
+    catalogue = catalogue_essai()
+    result = selectionner_equipements(catalogue, 20, 800, 50)
+    assert result[0]["id"] == "L1" and len(result) == 1, (
+        f"Expected 1 product of 'id': 'L1', got: {len(result)} products - {result}"
+    )
+    result2 = selectionner_equipements(catalogue, 20, 799, 50)
+    assert result2 == [], f"Expected [], got: {result2}"
 
 
 # Étape 3 : comparer les besoins aux références fournies.
+def test_consommables_disponibles():
+    """catalogue_essai() fournit et utilise {'liquide', 'billes'} ; seul ces codes sont attendus."""
+    catalogue = catalogue_essai()
+    result = consommables_disponibles(catalogue)
+    assert result == {"bille", "liquide"}, (
+        f"Expected {{''bille'', ''liquide''}}, got: {result}"
+    )
+
+
+def test_filtrer_par_consommable():
+    catalogue = catalogue_essai()
+    result = filtrer_par_consommable(catalogue, "bille")
+    assert result == [catalogue[0], catalogue[2]]
+
+
 def test_consommable_sans_fournisseur():
     """catalogue_essai() utilise « liquide » sans fournisseur ; seul ce code est attendu."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_consommable_sans_fournisseur est à compléter.")
+    catalogue = catalogue_essai()
+    result = consommables_sans_offre(catalogue)
+    assert type(result) == set, f"Expected result to be a set, not a {type(result)}"
+    assert result == {"liquide"}, f"Expected result to be {{'liquide'}}, not: {result}"
 
 
 # Étape 4 : contrôler la conversion et la copie d'une fiche.
 def test_lecture_demande():
     """« l1 ; 2 » doit donner {"id": "L1", "quantite": 2}, avec une quantité entière."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_lecture_demande est à compléter.")
+    texte = " l1 ; 2 "
+    result = lire_demande(texte)
+    assert result == {"id": "L1", "quantite": 2}, (
+        f"Expected {{'id': 'L1', 'quantite': 2}}, got: {result}"
+    )
 
 
 def test_ligne_independante():
     """Deux L1 coûtent 40 € ; la ligne est un autre dictionnaire et la fiche reste inchangée."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_ligne_independante est à compléter.")
+    catalogue = catalogue_essai()
+    result = preparer_ligne(catalogue[0], 2)
+    assert (
+        result["prix_euros"] == 20
+        and result["quantite"] == 2
+        and result["sous_total_euros"] == 40
+        and result is not catalogue[0]
+    )
+    catalogue2 = catalogue_essai()
+    assert result is not catalogue2[0]
 
 
 # Étape 5 : vérifier les cumuls, le paramètre par défaut et la mutation choisie.
 def test_total_cumule():
     """Deux lignes de sous-totaux 40 € et 15 € donnent 55 €, sans modifier les lignes."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_total_cumule est à compléter.")
+    all_lines = [{"sous_total_euros": 40}, {"sous_total_euros": 15}]
+    total = calculer_total(all_lines)
+    assert total == 55, f"Expected 55, got: {total}"
+    assert calculer_total([]) == 0
 
 
 def test_commande_vide_sans_frais():
     """Une commande vide donne zéro, même avec 10 € de frais demandés."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_commande_vide_sans_frais est à compléter.")
-
-
-def test_favori_autres_champs():
-    """Active puis désactive le favori de L1 ; les autres champs restent inchangés, retour None."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_favori_autres_champs est à compléter.")
+    assert calculer_total([]) == 0
+    assert total_avec_livraison([], 0) == 0
+    assert total_avec_livraison([], 10) == 0
 
 
 def test_frais_parametres():
     """Deux lignes totalisant 55 € donnent 61 € par défaut, 55 € avec zéro et 65 € avec dix."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_frais_parametres est à compléter.")
+    lignes = [{"sous_total_euros": 40}, {"sous_total_euros": 15}]
+    assert total_avec_livraison(lignes) == 61
+    assert total_avec_livraison(lignes, frais_euros=0) == 55
+    assert total_avec_livraison(lignes, frais_euros=10) == 65
+    assert total_avec_livraison([], frais_euros=10) == 0
+    assert lignes == [{"sous_total_euros": 40}, {"sous_total_euros": 15}]
+
+
+def test_favori_autres_champs():
+    """Active puis désactive le favori de L1 ; les autres champs restent inchangés, retour None."""
+    catalogue = petit_catalogue()
+    none_return = definir_favori(catalogue[0], True)
+    assert none_return == None, (
+        f"Expected definir_favori to return None, got : {none_return}"
+    )
+    assert (
+        catalogue[0]["favori"] == True
+        and catalogue[1]["favori"] == False
+        and catalogue[0]["categorie"] == "lanceur"
+    )
 
 
 # Étape 6 : vérifier plusieurs fonctions dans un même parcours.
 def test_parcours_complet():
     """Deux L1, une référence absente et trois M1 donnent 55 € avant frais et 61 € livrés."""
-    # À compléter : suis le contrat et les vérifications de cette étape dans le README.
-    raise NotImplementedError("test_parcours_complet est à compléter.")
+    catalogue = catalogue_essai()
+    all_demands = [" l1 ; 2 ", " absent ; 1 ", "m1;3", "   "]
+    formated_catalogue = preparer_commande(catalogue, all_demands)
+    assert formated_catalogue["inconnues"] == ["ABSENT"]
+    assert (
+        formated_catalogue["lignes"][0]["id"] == "L1"
+        and formated_catalogue["lignes"][1]["id"] == "M1"
+    )
+    assert calculer_total(formated_catalogue["lignes"]) == 55
+    assert total_avec_livraison(formated_catalogue["lignes"], 6) == 61
+    assert catalogue == catalogue_essai()
+    assert all_demands == [" l1 ; 2 ", " absent ; 1 ", "m1;3", "   "]
+
+
+def test_favoris_sur_catalogue_complet():
+    none_return = definir_favori(CATALOGUE[0], True)
+    assert none_return == None, (
+        f"Expected definir_favori to return None, got : {none_return}"
+    )
+    assert (
+        CATALOGUE[0]["favori"] == True
+        and CATALOGUE[1]["favori"] == False
+        and CATALOGUE[0]["categorie"] == "lanceur"
+    )
